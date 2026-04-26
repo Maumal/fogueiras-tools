@@ -8,6 +8,7 @@
 <title>Fogueiras Thumb Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="tumb.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700;800;900&family=Cinzel+Decorative:wght@700;900&family=Alegreya+SC:wght@700;800;900&family=Cormorant+Garamond:wght@600;700&family=Eczar:wght@700;800&family=Uncial+Antiqua&family=Pirata+One&family=MedievalSharp&family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="assets/html2canvas.min.js"></script>
 <style>
@@ -432,7 +433,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,.panel-title:focus
     <div class="stage" tabindex="0" aria-describedby="status">
       <div class="stage-inner">
         <div class="thumb" id="thumb" aria-live="polite" aria-atomic="true" role="img" aria-label="Preview da thumbnail">
-          <div class="base-image" id="baseImage" data-src="tumb.jpg"></div>
+          <div class="base-image" id="baseImage" data-src="tumb.jpg" style="background-image:url('tumb.jpg')"></div>
         <img src="" alt="Personagem 1" id="char1" class="character-image" />
         <img src="" alt="Personagem 2" id="char2" class="character-image" />
         <div class="text-block" id="textBlock" aria-label="Bloco de texto da thumbnail">
