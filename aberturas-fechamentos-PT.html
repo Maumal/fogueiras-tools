@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fogueiras do Mundo — Gerador v3.2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+<script src="assets/html2canvas.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#111; color:#ccc; font-family:'Inter',sans-serif; }
+
+  .painel {
+    max-width:720px; margin:40px auto; padding:40px;
+    background:#1a1a1a; border-radius:12px; border:1px solid #2a2a2a;
+  }
+  .painel h1 {
+    font-family:'Cormorant Garamond',serif;
+    font-size:32px; color:#C8820A; margin-bottom:8px;
+  }
+  .painel .sub { font-size:14px; color:#555; margin-bottom:32px; }
+
+  .grupo { margin-bottom:20px; }
+  .grupo label {
+    display:block; font-size:12px; color:#777;
+    letter-spacing:2px; text-transform:uppercase; margin-bottom:6px;
+  }
+  .grupo textarea {
+    width:100%; padding:14px 16px; background:#0e0e0e;
+    border:1px solid #2a2a2a; border-radius:6px; color:#E2D6C2;
+    font-family:'Cormorant Garamond',serif; font-size:20px;
+    outline:none; transition:border-color .2s; resize:vertical; min-height:56px;
+  }
+  .grupo textarea:focus { border-color:#C8820A; }
+  .dica { font-size:12px; color:#555; margin-top:4px; font-style:italic; }
+  .sep { height:1px; background:#222; margin:28px 0; }
+
+  .btn {
+    display:block; width:100%; padding:18px; background:#C8820A;
+    color:#0a0a0a; font-family:'Inter',sans-serif; font-size:15px;
+    font-weight:500; letter-spacing:2px; text-transform:uppercase;
+    border:none; border-radius:6px; cursor:pointer; transition:background .2s;
+  }
+  .btn:hover { background:#e09a10; }
+
+  .aviso {
+    background:#1a1510; border:1px solid #2a2218; border-radius:8px;
+    padding:16px 20px; margin-bottom:24px;
+  }
+  .aviso .titulo-aviso {
+    font-size:11px; color:#D4920E; letter-spacing:2px;
+    text-transform:uppercase; margin-bottom:8px;
+  }
+  .aviso .texto-aviso {
+    font-family:'Cormorant Garamond',serif; font-size:16px;
+    color:#8A7E6E; font-style:italic; line-height:1.5;
+  }
+
+  #preview {
+    margin-top:48px; display:flex; flex-direction:column;
+    align-items:center; gap:40px; padding-bottom:80px;
+  }
+
+  /* ═══ PREVIEW REDUZIDO via scale no CARD (estável) ═══ */
+  .card-wrapper {
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .card-wrapper .card {
+    transform: scale(0.5);
+    transform-origin: top center;
+    margin-bottom: -540px;
+  }
+  .card-wrapper .card.exporting {
+    transform: none !important;
+    margin-bottom: 0 !important;
+  }
+
+  .card-label {
+    font-size:24px; color:#444; letter-spacing:2px;
+    text-transform:uppercase; margin-bottom:16px; text-align:center;
+    font-family:'Inter',sans-serif;
+  }
+
+  .btn-download {
+    margin-top:28px; padding:20px 64px; background:transparent;
+    color:#C8820A; border:2px solid #C8820A; border-radius:12px;
+    font-family:'Inter',sans-serif; font-size:24px; letter-spacing:4px;
+    text-transform:uppercase; cursor:pointer; transition:all .2s;
+  }
+  .btn-download:hover { background:#C8820A; color:#0a0a0a; }
+  .btn-download:disabled { opacity:.5; cursor:wait; }
+
+  .btn-all {
+    display:none; margin:0 auto 40px; padding:16px 48px;
+    background:#C8820A; color:#0a0a0a; border:none; border-radius:6px;
+    font-family:'Inter',sans-serif; font-size:14px; font-weight:500;
+    letter-spacing:2px; text-transform:uppercase; cursor:pointer;
+    transition:background .2s;
+  }
+  .btn-all:hover { background:#e09a10; }
+
+  .status {
+    font-size:22px; color:#555; text-align:center;
+    margin-top:8px; min-height:30px;
+  }
+
+  .indicador {
+    display:inline-block; padding:4px 10px; margin-left:12px;
+    font-size:11px; border-radius:4px; background:#222;
+    color:#888; letter-spacing:1px; vertical-align:middle;
+  }
+  .indicador.ativo { background:#2a3a1a; color:#8ab560; }
+
+  /* ═══ CARDS 1920×1080 ═══ */
+  .card {
+    width:1920px; height:1080px; position:relative;
+    overflow:hidden; background:#060403;
+  }
+  .card .bg {
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse 80% 70% at 50% 42%,
+      #1a1208 0%, #100d06 40%, #060403 100%);
+  }
+  .card .vinheta {
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse 60% 50% at 50% 42%,
+      transparent 0%, rgba(2,1,0,.82) 100%);
+    z-index:1;
+  }
+  .card .edge-top, .card .edge-bot {
+    position:absolute; left:80px; right:80px; height:1px;
+    background: linear-gradient(90deg, transparent 0%,
+      rgba(200,130,10,.18) 20%, rgba(200,130,10,.18) 80%, transparent 100%);
+    z-index:4;
+  }
+  .card .edge-top { top:60px; }
+  .card .edge-bot { bottom:60px; }
+
+  .card .wrap {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding: 120px 160px;
+    z-index:3;
+  }
+
+  /* Card 1: Marca */
+  .card.marca .nome {
+    font-family:'Cormorant Garamond',serif; font-size:99px;
+    font-weight:600; color:#EDE4D2; letter-spacing:6px;
+    text-align:center; text-shadow:0 2px 40px rgba(200,130,10,.12);
+  }
+  .card.marca .divisor {
+    display:flex; align-items:center; gap:28px; margin:52px 0 48px;
+  }
+  .card.marca .divisor-linha {
+    width:120px; height:1px;
+    background: linear-gradient(90deg, transparent, rgba(212,146,14,.55));
+  }
+  .card.marca .divisor-linha.dir {
+    background: linear-gradient(90deg, rgba(212,146,14,.55), transparent);
+  }
+  .card.marca .sub-marca {
+    font-family:'Cormorant Garamond',serif; font-size:47px;
+    font-weight:300; font-style:italic; color:#A89880;
+    letter-spacing:1px; text-align:center;
+  }
+
+  /* Card 2: Cartela */
+  .card.cartela .titulo {
+    font-family:'Cormorant Garamond',serif; font-weight:700;
+    color:#EDE4D2; text-align:center; line-height:1.1;
+    letter-spacing:-1px; max-width:1600px;
+    text-shadow:0 2px 60px rgba(200,130,10,.1);
+  }
+  .card.cartela .linha {
+    width:80px; height:2px;
+    background: linear-gradient(90deg, transparent, #D4920E 30%, #D4920E 70%, transparent);
+    margin:52px 0 48px; opacity:.6;
+  }
+  .card.cartela .fonte {
+    font-family:'Cormorant Garamond',serif; font-weight:400;
+    color:#B8A890; text-align:center; line-height:1.5;
+    font-style:italic; max-width:1300px;
+  }
+  .card.cartela .regiao {
+    font-family:'Inter',sans-serif; font-size:17px; font-weight:300;
+    color:#5A5448; text-align:center; letter-spacing:6px;
+    text-transform:uppercase; margin-top:32px;
+  }
+
+  /* Card 3: Fechamento */
+  .card.fechamento .linha {
+    width:80px; height:1px;
+    background: linear-gradient(90deg, transparent, #D4920E 30%, #D4920E 70%, transparent);
+    opacity:.4;
+  }
+  .card.fechamento .l1 {
+    font-family:'Cormorant Garamond',serif; font-weight:400;
+    color:#B8A890; text-align:center; line-height:1.5;
+    font-style:italic; margin:60px 0 28px; max-width:1300px;
+  }
+  .card.fechamento .l2 {
+    font-family:'Cormorant Garamond',serif; font-weight:300;
+    color:#7A7060; text-align:center; line-height:1.5;
+    margin-bottom:60px; max-width:1300px;
+  }
+
+  em { font-style:italic; color:#D4920E; }
+
+  /* ═══ v3.2 — POLIMENTO TIPOGRÁFICO PREMIUM ═══ */
+  .card .nome,
+  .card .sub-marca,
+  .card .titulo,
+  .card .fonte,
+  .card .l1,
+  .card .l2 {
+    font-feature-settings: "liga" 1, "dlig" 1, "kern" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ═══ v3.2 — ORNAMENTO ✦ NO DIVISOR DO CARD 1 ═══ */
+  .card.marca .divisor-orn {
+    font-family:'Cormorant Garamond',serif;
+    font-size:42px; font-weight:400;
+    color:#D4920E; opacity:.78;
+    line-height:1; transform:translateY(-3px);
+    font-feature-settings: "liga" 1, "kern" 1;
+  }
+</style>
+</head>
+<body>
+
+
+    <div class="painel">
+  <h1>🔥 Fogueiras do Mundo</h1>
+  <div class="sub">
+    Gerador de cards v3.2 · 1920×1080 → exporta 2K (2560×1440)
+    <span class="indicador ativo" id="liveInd">● AO VIVO</span>
+  </div>
+
+  <div class="aviso">
+    <div class="titulo-aviso">Card 1 · Marca (fixa em todos os vídeos)</div>
+    <div class="texto-aviso">
+      Fogueiras do Mundo<br>
+      histórias que vieram antes de nós
+    </div>
+  </div>
+
+  <div class="grupo">
+    <label>Código do vídeo</label>
+    <textarea id="inCodigo" rows="1">f1-03</textarea>
+    <div class="dica">Usado no nome do arquivo PNG (ex: f1-03-01-marca.png)</div>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="grupo">
+    <label>Título da história</label>
+    <textarea id="inTitulo" rows="2">Orfeu e Eurídice</textarea>
+  </div>
+
+  <div class="grupo">
+    <label>Fonte / Obra / Corpus</label>
+    <textarea id="inFonte" rows="2">Virgílio (Geórgicas) e Ovídio (Metamorfoses)</textarea>
+  </div>
+
+  <div class="grupo">
+    <label>Região · Tipo de registro</label>
+    <textarea id="inRegiao" rows="2">Mediterrâneo antigo · fonte clássica</textarea>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="grupo">
+    <label>Fechamento — Linha 1</label>
+    <textarea id="inFecha1" rows="2">Narração editorial baseada em fonte preservada</textarea>
+  </div>
+
+  <div class="grupo">
+    <label>Fechamento — Linha 2</label>
+    <textarea id="inFecha2" rows="2">Versão organizada a partir de fontes clássicas</textarea>
+  </div>
+
+  <div class="sep"></div>
+  <button class="btn" onclick="gerar()">🔥 GERAR / ATUALIZAR CARDS</button>
+</div>
+
+<button class="btn-all" id="btnAll" onclick="baixarTodos()">⬇ BAIXAR TODOS (3 PNGs em 2K)</button>
+<div id="preview"></div>
+
+<script>
+  function esc(s){
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  }
+  function fmt(r){
+    return esc(r).replace(/\*([^*]+)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+  }
+  function slug(s, fallback){
+    return String(s || fallback || 'card')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+      .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || (fallback || 'card');
+  }
+
+  function fitWithin(el, maxPx, minPx, maxH, maxW){
+    if(!el) return;
+    var size = maxPx;
+    el.style.fontSize = size + 'px';
+    void el.offsetHeight;
+    var guard = 0;
+    while(guard++ < 80 && size > minPx &&
+          (el.scrollHeight > maxH || el.scrollWidth > maxW)){
+      size -= 2;
+      el.style.fontSize = size + 'px';
+      void el.offsetHeight;
+    }
+  }
+
+  function gerar(){
+    var cod    = slug(document.getElementById('inCodigo').value, 'card');
+    var titulo = document.getElementById('inTitulo').value;
+    var fonte  = document.getElementById('inFonte').value;
+    var regiao = document.getElementById('inRegiao').value;
+    var f1     = document.getElementById('inFecha1').value;
+    var f2     = document.getElementById('inFecha2').value;
+
+    var shared = '<div class="bg"></div><div class="vinheta"></div>'
+               + '<div class="edge-top"></div><div class="edge-bot"></div>';
+
+    var c1 = cod + '-01-marca';
+    var c2 = cod + '-02-cartela';
+    var c3 = cod + '-03-fechamento';
+
+    var h = '';
+
+    // Card 1 — Marca (com ornamento ✦)
+    h += '<div class="card-wrapper">';
+    h +=   '<div class="card-label">Card 1 · Marca (fixa)</div>';
+    h +=   '<div class="card marca" id="'+c1+'">'+ shared;
+    h +=     '<div class="wrap">';
+    h +=       '<div class="nome">Fogueiras do Mundo</div>';
+    h +=       '<div class="divisor"><div class="divisor-linha"></div><div class="divisor-orn">✦</div><div class="divisor-linha dir"></div></div>';
+    h +=       '<div class="sub-marca">histórias que vieram antes de nós</div>';
+    h +=     '</div>';
+    h +=   '</div>';
+    h +=   '<button class="btn-download" onclick="baixar(\''+c1+'\')">⬇ Baixar PNG 2K</button>';
+    h +=   '<div class="status" id="st-'+c1+'"></div>';
+    h += '</div>';
+
+    // Card 2 — Cartela
+    h += '<div class="card-wrapper">';
+    h +=   '<div class="card-label">Card 2 · Cartela Editorial</div>';
+    h +=   '<div class="card cartela" id="'+c2+'">'+ shared;
+    h +=     '<div class="wrap">';
+    h +=       '<div class="titulo" id="fit-titulo">'+fmt(titulo)+'</div>';
+    h +=       '<div class="linha"></div>';
+    h +=       '<div class="fonte" id="fit-fonte">'+fmt(fonte)+'</div>';
+    h +=       '<div class="regiao">'+fmt(regiao)+'</div>';
+    h +=     '</div>';
+    h +=   '</div>';
+    h +=   '<button class="btn-download" onclick="baixar(\''+c2+'\')">⬇ Baixar PNG 2K</button>';
+    h +=   '<div class="status" id="st-'+c2+'"></div>';
+    h += '</div>';
+
+    // Card 3 — Fechamento
+    h += '<div class="card-wrapper">';
+    h +=   '<div class="card-label">Card 3 · Fechamento Editorial</div>';
+    h +=   '<div class="card fechamento" id="'+c3+'">'+ shared;
+    h +=     '<div class="wrap">';
+    h +=       '<div class="linha"></div>';
+    h +=       '<div class="l1" id="fit-l1">'+fmt(f1)+'</div>';
+    h +=       '<div class="l2" id="fit-l2">'+fmt(f2)+'</div>';
+    h +=       '<div class="linha"></div>';
+    h +=     '</div>';
+    h +=   '</div>';
+    h +=   '<button class="btn-download" onclick="baixar(\''+c3+'\')">⬇ Baixar PNG 2K</button>';
+    h +=   '<div class="status" id="st-'+c3+'"></div>';
+    h += '</div>';
+
+    var prev = document.getElementById('preview');
+    prev.innerHTML = '';
+    prev.innerHTML = h;
+    document.getElementById('btnAll').style.display = 'block';
+
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        fitWithin(document.getElementById('fit-titulo'), 108, 60, 300, 1600);
+        fitWithin(document.getElementById('fit-fonte'),   40, 26, 180, 1300);
+        fitWithin(document.getElementById('fit-l1'),      52, 34, 200, 1300);
+        fitWithin(document.getElementById('fit-l2'),      38, 24, 200, 1300);
+      });
+    });
+  }
+
+  async function baixar(id){
+    var el = document.getElementById(id);
+    var st = document.getElementById('st-'+id);
+    if(!el) return;
+    st.textContent = 'Gerando 2K...';
+
+    el.classList.add('exporting');
+    void el.offsetHeight;
+
+    try{
+      if(document.fonts && document.fonts.ready) await document.fonts.ready;
+      await new Promise(function(r){
+        requestAnimationFrame(function(){ requestAnimationFrame(r); });
+      });
+
+      var canvas = await html2canvas(el, {
+        width: 1920, height: 1080,
+        windowWidth: 1920, windowHeight: 1080,
+        scale: 4 / 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#060403',
+        logging: false,
+        imageTimeout: 0,
+        foreignObjectRendering: false
+      });
+      var a = document.createElement('a');
+      a.download = id + '.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+      st.textContent = '✓ Salvo em 2K (' + canvas.width + '×' + canvas.height + ')';
+      setTimeout(function(){ st.textContent=''; }, 3500);
+    }catch(e){
+      console.error(e);
+      st.textContent = '✗ Erro: ' + e.message;
+    }finally{
+      el.classList.remove('exporting');
+    }
+  }
+
+  async function baixarTodos(){
+    var btn = document.getElementById('btnAll');
+    btn.textContent = 'GERANDO...'; btn.disabled = true;
+    var els = document.querySelectorAll('#preview .card');
+    for(var i=0; i<els.length; i++){
+      await baixar(els[i].id);
+      await new Promise(function(r){ setTimeout(r, 600); });
+    }
+    btn.textContent = '⬇ BAIXAR TODOS (3 PNGs em 2K)';
+    btn.disabled = false;
+  }
+
+  var tDeb;
+  function agendar(){
+    clearTimeout(tDeb);
+    tDeb = setTimeout(gerar, 400);
+  }
+  ['inCodigo','inTitulo','inFonte','inRegiao','inFecha1','inFecha2']
+    .forEach(function(id){
+      document.getElementById(id).addEventListener('input', agendar);
+    });
+
+  document.addEventListener('keydown', function(e){
+    if((e.ctrlKey||e.metaKey) && e.key==='s'){
+      e.preventDefault();
+      if(document.getElementById('btnAll').style.display==='block') baixarTodos();
+    }
+  });
+
+  window.addEventListener('load', gerar);
+</script>
+</body>
+</html>
