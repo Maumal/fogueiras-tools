@@ -982,30 +982,32 @@ function status(msg, type=''){
   el.className = `status ${type}`;
 }
 
+const AUTOSAVE_KEY = 'fogueiras-thumb-autosave-v5-default-tumb';
+
 // Autosave localStorage
 function saveAutosave(){
   try {
-    localStorage.setItem('fogueiras-thumb-autosave-v4-final', JSON.stringify(getState()));
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(getState()));
   } catch {}
 }
 
 function restoreAutosave(){
   try {
-    const data = JSON.parse(localStorage.getItem('fogueiras-thumb-autosave-v4-final'));
+    const data = JSON.parse(localStorage.getItem(AUTOSAVE_KEY));
     if(data) restoreState(data, {pushHistory:false});
   } catch {}
 }
 
 // Limpar autosave
 function limparAutosave(){
-  localStorage.removeItem('fogueiras-thumb-autosave-v4-final');
+  localStorage.removeItem(AUTOSAVE_KEY);
   status('Autosave limpo','success');
 }
 
 // Reset geral
 function resetTudo(){
   if(confirm('Deseja resetar todas as configurações?')){
-    localStorage.removeItem('fogueiras-thumb-autosave-v4-final');
+    localStorage.removeItem(AUTOSAVE_KEY);
     location.reload();
   }
 }
