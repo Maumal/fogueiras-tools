@@ -237,10 +237,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,.panel-title:focus
         <div class="field"><label for="formato">Formato</label>
           <select id="formato"><option value="16x9" selected>Thumbnail 1920×1080</option><option value="9x16">Short vertical 1080×1920</option><option value="1x1">Post quadrado 1080×1080</option></select>
         </div>
-        <div class="field"><label for="titulo">Título</label><input id="titulo" maxlength="80" value="ANANSI"></div>
-        <div class="field"><label for="subtitulo">Subtítulo</label><input id="subtitulo" maxlength="90" value="ROUBOU AS HISTÓRIAS"></div>
+        <div class="field"><label for="titulo">Título</label><input id="titulo" maxlength="80" value="TÍTULO"></div>
+        <div class="field"><label for="subtitulo">Subtítulo</label><input id="subtitulo" maxlength="90" value="SUBTÍTULO"></div>
         <div class="field"><label for="badgeText">Selo cultural (opcional)</label><input id="badgeText" maxlength="40" value="POVO AKAN · GANA"></div>
-        <div class="field"><label for="filename">Nome do arquivo</label><input id="filename" value="anansi-historias"></div>
+        <div class="field"><label for="filename">Nome do arquivo</label><input id="filename" value="thumb"></div>
       </div>
     </div>
 
@@ -432,7 +432,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,.panel-title:focus
     <div class="stage" tabindex="0" aria-describedby="status">
       <div class="stage-inner">
         <div class="thumb" id="thumb" aria-live="polite" aria-atomic="true" role="img" aria-label="Preview da thumbnail">
-          <div class="base-image" id="baseImage"></div>
+          <div class="base-image" id="baseImage" data-src="tumb.jpg"></div>
         <img src="" alt="Personagem 1" id="char1" class="character-image" />
         <img src="" alt="Personagem 2" id="char2" class="character-image" />
         <div class="text-block" id="textBlock" aria-label="Bloco de texto da thumbnail">
@@ -872,6 +872,16 @@ function handleDropFile(dz, file, callback){
     callback(dataUrl);
   };
   reader.readAsDataURL(file);
+}
+
+function initDefaultBaseImage(){
+  const base = $('baseImage');
+  const dz = $('dropzone');
+  if(!base?.dataset.src || !dz) return;
+  dz.style.backgroundImage = `url("${base.dataset.src}")`;
+  dz.classList.add('loaded');
+  const label = dz.querySelector('.dz-label');
+  if(label) label.textContent = base.dataset.src.split('/').pop();
 }
 
 // Restaurar template JSON
@@ -1375,6 +1385,7 @@ window.addEventListener('load', () => {
   configurarDropzone('dropzone', 'imageUpload', loadImage);
   configurarDropzone('dropzoneP1', 'imageUploadP1', loadCharacter1);
   configurarDropzone('dropzoneP2', 'imageUploadP2', loadCharacter2);
+  initDefaultBaseImage();
 
   // Paletas de cor
   document.querySelectorAll('.palette-row').forEach(row => {
