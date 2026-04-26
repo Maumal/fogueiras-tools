@@ -390,7 +390,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,.panel-title:focus
       <div class="panel-body">
         <input type="file" id="jsonRestore" accept=".json,application/json" hidden>
         <div class="btn-row"><button class="btn secondary" onclick="salvarTemplate()" type="button">Salvar template</button><button class="btn secondary" onclick="$('jsonRestore').click()" type="button">Carregar template</button></div>
-        <div class="btn-row" style="margin-top:9px"><button class="btn secondary" onclick="limparAutosave()" type="button">Limpar autosave</button><button class="btn secondary" onclick="resetTudo()" type="button">Reset geral</button></div>
+        <button class="btn secondary" onclick="resetTudo()" type="button" style="margin-top:9px">Reset geral</button>
         <div class="field" style="margin-top:12px"><label for="jpgQuality">Qualidade JPG</label><input type="range" id="jpgQuality" min=".7" max="1" step=".01" value=".92"><div class="range-row"><span>.7</span><span class="range-value" id="jpgQualityValue">.92</span><span>1</span></div></div>
         <button class="btn export-btn" id="btnDownload" onclick="baixar('jpg')" type="button" aria-label="Exportar em JPG">⬇ Exportar JPG 1920×1080</button>
         <div class="btn-row" style="margin-top:8px"><button class="btn secondary" onclick="baixar('png')" type="button">Exportar PNG</button><button class="btn secondary" onclick="baixar('webp')" type="button">Exportar WebP</button></div>
@@ -584,7 +584,6 @@ function restoreState(state, opts = {pushHistory:true}){
   }
   atualizar();
   if(opts.pushHistory) saveHistory();
-  saveAutosave();
 }
 
 function aplicarFormato(){
@@ -702,9 +701,6 @@ function atualizar(){
 
   // Atualiza valores visuais dos sliders
   setRangeLabels();
-
-  // Salva autosave
-  saveAutosave();
 
   // Atualiza mini-preview
   atualizarMiniPreview();
@@ -983,32 +979,9 @@ function status(msg, type=''){
   el.className = `status ${type}`;
 }
 
-const AUTOSAVE_KEY = 'fogueiras-thumb-autosave-v5-default-tumb';
-
-// Autosave localStorage
-function saveAutosave(){
-  try {
-    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(getState()));
-  } catch {}
-}
-
-function restoreAutosave(){
-  try {
-    const data = JSON.parse(localStorage.getItem(AUTOSAVE_KEY));
-    if(data) restoreState(data, {pushHistory:false});
-  } catch {}
-}
-
-// Limpar autosave
-function limparAutosave(){
-  localStorage.removeItem(AUTOSAVE_KEY);
-  status('Autosave limpo','success');
-}
-
 // Reset geral
 function resetTudo(){
   if(confirm('Deseja resetar todas as configurações?')){
-    localStorage.removeItem(AUTOSAVE_KEY);
     location.reload();
   }
 }
@@ -1436,9 +1409,6 @@ window.addEventListener('load', () => {
 
   // Inicializa drag no canvas
   enableDrag();
-
-  // Restaura autosave
-  restoreAutosave();
 
   // Inicializa labels e preview
   setRangeLabels();
